@@ -11,7 +11,7 @@ export class CustomerRepositoryDatabase implements CustomerRepository {
     this.connection = knex(development);
   }
 
-  async save(customer: Customer): Promise<void> {
+  async create(customer: Customer): Promise<void> {
     await this.connection("customer").insert({
       id: customer.getId().getValue(),
       name: customer.getName(),

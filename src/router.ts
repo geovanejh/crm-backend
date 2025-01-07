@@ -2,46 +2,58 @@ import { Request, Response, Router } from "express";
 // import { CustomerRepositoryInMemory } from "./infra/repository/memory/CustomerRepositoryInMemory";
 import {
   CustomerCreate,
-  CustomerDeleteById,
-  CustomerEditById,
-  CustomerList,
-  CustomerListById,
+  CustomerDelete,
+  CustomerEdit,
+  CustomerGetAll,
+  CustomerGetById,
 } from "./controller/CustomerController";
 import { CustomerRepositoryDatabase } from "./infra/repository/database/CustomerRepositoryDatabase";
+import {
+  CustomerCreateService,
+  CustomerDeleteService,
+  CustomerEditService,
+  CustomerGetAllService,
+  CustomerGetByIdService,
+} from "./services/customerService";
 
 const router = Router();
 
 // const repository = new CustomerRepositoryInMemory();
 const repository = new CustomerRepositoryDatabase();
 
-const customerCreate = new CustomerCreate(repository);
+const customerCreateService = new CustomerCreateService(repository);
+const customerCreate = new CustomerCreate(customerCreateService);
 
-const customerList = new CustomerList(repository);
+const customerGetAllService = new CustomerGetAllService(repository);
+const customerGetAll = new CustomerGetAll(customerGetAllService);
 
-const customerListById = new CustomerListById(repository);
+const costumerGetByIdService = new CustomerGetByIdService(repository);
+const customerGetById = new CustomerGetById(costumerGetByIdService);
 
-const customerEditById = new CustomerEditById(repository);
+const customerEditService = new CustomerEditService(repository);
+const customerEdit = new CustomerEdit(customerEditService);
 
-const customerDeleteById = new CustomerDeleteById(repository);
+const customerDeleteService = new CustomerDeleteService(repository);
+const customerDelete = new CustomerDelete(customerDeleteService);
 
 router.post("/customer", (request: Request, response: Response) => {
   customerCreate.execute(request, response);
 });
 
 router.get("/customer", (request: Request, response: Response) => {
-  customerList.execute(request, response);
+  customerGetAll.execute(request, response);
 });
 
 router.get("/customer/:id", (request: Request, response: Response) => {
-  customerListById.execute(request, response);
+  customerGetById.execute(request, response);
 });
 
 router.put("/customer/:id", (request: Request, response: Response) => {
-  customerEditById.execute(request, response);
+  customerEdit.execute(request, response);
 });
 
 router.delete("/customer/:id", (request: Request, response: Response) => {
-  customerDeleteById.execute(request, response);
+  customerDelete.execute(request, response);
 });
 
 export { router };

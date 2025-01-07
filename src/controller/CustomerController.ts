@@ -1,58 +1,64 @@
 import { Request, Response } from "express";
-import { CustomerRepository } from "../model/repository/CustomerRepository";
 import { Customer } from "../model/Customer";
 import { Uuid } from "../model/Uuid";
+import {
+  CustomerCreateService,
+  CustomerDeleteService,
+  CustomerEditService,
+  CustomerGetAllService,
+  CustomerGetByIdService,
+} from "../services/customerService";
 
 export class CustomerCreate {
-  constructor(readonly repository: CustomerRepository) {}
+  constructor(readonly service: CustomerCreateService) {}
 
   async execute(request: Request, response: Response) {
     const { name, document } = request.body;
-
     const customer = Customer.create(name, document);
-    await this.repository.save(customer);
+    await this.service.execute(customer);
     response.status(201).json({ customer });
   }
 }
 
-export class CustomerList {
-  constructor(readonly repository: CustomerRepository) {}
+export class CustomerGetAll {
+  constructor(readonly service: CustomerGetAllService) {}
 
   async execute(request: Request, response: Response) {
-    const customers = await this.repository.getAll();
+    const customers = await this.service.execute();
     response.status(200).json({ customers });
   }
 }
 
-export class CustomerListById {
-  constructor(readonly repository: CustomerRepository) {}
+export class CustomerGetById {
+  constructor(readonly service: CustomerGetByIdService) {}
 
   async execute(request: Request, response: Response) {
     const id: Uuid = new Uuid(request.params.id);
-    const customer = await this.repository.getById(id);
+    const customer = await this.service.execute(id);
     response.status(200).json({ customer });
   }
 }
 
-export class CustomerEditById {
-  constructor(readonly repository: CustomerRepository) {}
+export class CustomerEdit {
+  constructor(readonly service: CustomerEditService) {}
 
   async execute(request: Request, response: Response) {
     const id: Uuid = new Uuid(request.params.id);
     const { name, document } = request.body;
-
     const customer = Customer.create(name, document, id.getValue());
-    await this.repository.editById(id, customer);
+    await this.service.execute(customer);
     response.status(200).json({ customer });
   }
 }
 
-export class CustomerDeleteById {
-  constructor(readonly repository: CustomerRepository) {}
+export class CustomerDelete {
+  constructor(readonly service: CustomerDeleteService) {}
 
   async execute(request: Request, response: Response) {
     const id: Uuid = new Uuid(request.params.id);
-    await this.repository.deleteById(id);
-    response.status(200).send();
+    await this.service.execute(id);
+    response
+      .status(200)
+      .send({ message: `Customer with id ${id.getValue()} deleted` });
   }
 }
