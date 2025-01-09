@@ -1,3 +1,18 @@
-import { App } from "./app";
+import "express-async-errors";
+import { ErrorHandler } from "./middlewares/error";
+import router from "./router";
 
-new App().getServer().listen(3000);
+const express = require("express");
+
+const app = express();
+
+app.use(express.json());
+
+app.use(router);
+
+app.use(ErrorHandler);
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

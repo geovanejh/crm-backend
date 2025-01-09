@@ -1,8 +1,9 @@
 import knex, { Knex } from "knex";
 import { Customer } from "../../../model/Customer";
 import { CustomerRepository } from "../../../model/repository/CustomerRepository";
-import { development } from "./KnexConfig";
 import { Uuid } from "../../../model/Uuid";
+import { NotFoundError } from "../../../utils/api-errors";
+import { development } from "./KnexConfig";
 
 export class CustomerRepositoryDatabase implements CustomerRepository {
   private connection: Knex;
@@ -41,7 +42,7 @@ export class CustomerRepositoryDatabase implements CustomerRepository {
       .first();
 
     if (!customer) {
-      throw new Error(`Customer with id ${id.getValue()} not found`);
+      throw new NotFoundError(`Customer with id ${id.getValue()} not found`);
     }
 
     return Customer.create(customer.name, customer.document, customer.id);
@@ -55,6 +56,12 @@ export class CustomerRepositoryDatabase implements CustomerRepository {
   }
 
   async deleteById(id: Uuid): Promise<void> {
-    await this.connection("customer").where({ id: id.getValue() }).delete();
+    const customer = await this.connection("customer")
+      .where({ id: id.getValue() })
+      .delete();
+
+    if (!customer) {
+      throw new NotFoundError(`Customer with id ${id.getValue()} not found`);
+    }
   }
 }

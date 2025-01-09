@@ -1,5 +1,4 @@
-import { Request, Response, Router } from "express";
-// import { CustomerRepositoryInMemory } from "./infra/repository/memory/CustomerRepositoryInMemory";
+import { NextFunction, Request, Response, Router } from "express";
 import {
   CustomerCreate,
   CustomerDelete,
@@ -14,7 +13,7 @@ import {
   CustomerEditService,
   CustomerGetAllService,
   CustomerGetByIdService,
-} from "./services/customerService";
+} from "./services/CustomerService";
 
 const router = Router();
 
@@ -28,7 +27,7 @@ const customerGetAllService = new CustomerGetAllService(repository);
 const customerGetAll = new CustomerGetAll(customerGetAllService);
 
 const costumerGetByIdService = new CustomerGetByIdService(repository);
-const customerGetById = new CustomerGetById(costumerGetByIdService);
+const costumerGetById = new CustomerGetById(costumerGetByIdService);
 
 const customerEditService = new CustomerEditService(repository);
 const customerEdit = new CustomerEdit(customerEditService);
@@ -36,24 +35,39 @@ const customerEdit = new CustomerEdit(customerEditService);
 const customerDeleteService = new CustomerDeleteService(repository);
 const customerDelete = new CustomerDelete(customerDeleteService);
 
-router.post("/customer", (request: Request, response: Response) => {
-  customerCreate.execute(request, response);
-});
+router.post(
+  "/customer",
+  (request: Request, response: Response, next: NextFunction) => {
+    customerCreate.execute(request, response, next);
+  }
+);
 
-router.get("/customer", (request: Request, response: Response) => {
-  customerGetAll.execute(request, response);
-});
+router.get(
+  "/customer",
+  (request: Request, response: Response, next: NextFunction) => {
+    customerGetAll.execute(request, response, next);
+  }
+);
 
-router.get("/customer/:id", (request: Request, response: Response) => {
-  customerGetById.execute(request, response);
-});
+router.get(
+  "/customer/:id",
+  (request: Request, response: Response, next: NextFunction) => {
+    costumerGetById.execute(request, response, next);
+  }
+);
 
-router.put("/customer/:id", (request: Request, response: Response) => {
-  customerEdit.execute(request, response);
-});
+router.put(
+  "/customer/:id",
+  (request: Request, response: Response, next: NextFunction) => {
+    customerEdit.execute(request, response, next);
+  }
+);
 
-router.delete("/customer/:id", (request: Request, response: Response) => {
-  customerDelete.execute(request, response);
-});
+router.delete(
+  "/customer/:id",
+  (request: Request, response: Response, next: NextFunction) => {
+    customerDelete.execute(request, response, next);
+  }
+);
 
-export { router };
+export default router;

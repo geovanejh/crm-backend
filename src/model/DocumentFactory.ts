@@ -1,3 +1,4 @@
+import { BadRequestError } from "../utils/api-errors";
 import { Cnpj } from "./Cnpj";
 import { Cpf } from "./Cpf";
 import { Document } from "./Document";
@@ -12,6 +13,6 @@ export class DocumentFactory {
       return new Cnpj(value);
     }
 
-    throw new Error(`Invalid document: ${value}`);
+    throw new BadRequestError(`invalid document: ${value}`);
   }
 }
