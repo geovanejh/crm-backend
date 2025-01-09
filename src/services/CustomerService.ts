@@ -6,8 +6,7 @@ export class CustomerCreateService {
   constructor(readonly repository: CustomerRepository) {}
 
   async execute(customer: Customer) {
-    await this.repository.create(customer);
-    return customer;
+    return await this.repository.create(customer);
   }
 }
 

@@ -1,16 +1,13 @@
-// Update with your config settings.
-
-/**
- * @type { Object.<string, import("knex").Knex.Config> }
- */
+import { config } from "dotenv";
+config();
 
 export const development = {
-  client: "mysql",
+  client: process.env.DB_CLIENT,
   connection: {
-    user: "root",
-    password: "",
-    host: "localhost",
-    port: 3306,
-    database: "customer",
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT),
+    database: process.env.DB_NAME,
   },
 };
