@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { Customer } from "../model/Customer";
-import { Uuid } from "../model/Uuid";
+import { Customer } from "../entities/Customer";
+import { Uuid } from "../entities/Uuid";
 import {
   CustomerCreateService,
   CustomerDeleteService,

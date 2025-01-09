@@ -1,18 +1,16 @@
 import "express-async-errors";
 import { ErrorHandler } from "./middlewares/error";
-import router from "./router";
+import router from "./routes/router";
+import { AppDataSource } from "./data-source";
 
-const express = require("express");
+AppDataSource.initialize().then(() => {
+  const express = require("express");
 
-const app = express();
+  const app = express();
+  app.use(express.json());
 
-app.use(express.json());
+  app.use(router);
+  app.use(ErrorHandler);
 
-app.use(router);
-
-app.use(ErrorHandler);
-
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  return app.listen(process.env.PORT);
 });

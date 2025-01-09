@@ -1,6 +1,6 @@
-import { Customer } from "../model/Customer";
-import { CustomerRepository } from "../model/repository/CustomerRepository";
-import { Uuid } from "../model/Uuid";
+import { Customer } from "../entities/Customer";
+import { CustomerRepository } from "../entities/repository/CustomerRepository";
+import { Uuid } from "../entities/Uuid";
 
 export class CustomerCreateService {
   constructor(readonly repository: CustomerRepository) {}

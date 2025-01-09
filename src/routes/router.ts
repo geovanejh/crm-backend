@@ -5,15 +5,16 @@ import {
   CustomerEdit,
   CustomerGetAll,
   CustomerGetById,
-} from "./controller/CustomerController";
-import { CustomerRepositoryDatabase } from "./infra/repository/database/CustomerRepositoryDatabase";
+} from "../controller/CustomerController";
+import { CustomerRepositoryDatabase } from "../infra/repository/database/CustomerRepositoryDatabase";
 import {
   CustomerCreateService,
   CustomerDeleteService,
   CustomerEditService,
   CustomerGetAllService,
   CustomerGetByIdService,
-} from "./services/CustomerService";
+} from "../services/CustomerService";
+import { UserController } from "../controller/UserController";
 
 const router = Router();
 
