@@ -1,84 +1,65 @@
-import { NextFunction, Request, Response } from "express";
-import { Customer } from "../model/Customer";
-import { Uuid } from "../model/Uuid";
-import {
-  CustomerCreateService,
-  CustomerDeleteService,
-  CustomerEditService,
-  CustomerGetAllService,
-  CustomerGetByIdService,
-} from "../services/CustomerService";
+import { Request, Response } from "express";
+import { customerRepository } from "../repositories/customerRepository";
+import { BadRequestError, NotFoundError } from "../utils/api-errors";
 
-export class CustomerCreate {
-  constructor(readonly service: CustomerCreateService) {}
+export class CustomerController {
+  async create(request: Request, response: Response) {
+    const { name, document } = request.body;
+    const customer = customerRepository.create({ name, document });
 
-  async execute(request: Request, response: Response, next: NextFunction) {
-    try {
-      const { name, document } = request.body;
-      const customer = Customer.create(name, document);
-      await this.service.execute(customer);
-      response.status(201).json({ customer });
-    } catch (error) {
-      next(error);
+    if (!customer.name || !customer.document) {
+      throw new BadRequestError("Name and document are required");
     }
+
+    await customerRepository.save(customer);
+    response.status(201).json({ customer });
   }
-}
 
-export class CustomerGetAll {
-  constructor(readonly service: CustomerGetAllService) {}
-
-  async execute(request: Request, response: Response, next: NextFunction) {
-    try {
-      const customers = await this.service.execute();
-      response.status(200).json({ customers });
-    } catch (error) {
-      next(error);
-    }
+  async getAll(request: Request, response: Response) {
+    const customers = await customerRepository.find();
+    response.status(200).json({ customers });
   }
-}
 
-export class CustomerGetById {
-  constructor(readonly service: CustomerGetByIdService) {}
+  async getById(request: Request, response: Response) {
+    const id = request.params.id;
 
-  async execute(request: Request, response: Response, next: NextFunction) {
-    try {
-      const id: Uuid = new Uuid(request.params.id);
-      const customer = await this.service.execute(id);
-      response.status(200).json({ customer });
-    } catch (error) {
-      next(error);
+    const customer = await customerRepository.findOneBy({ id });
+
+    if (!customer) {
+      throw new NotFoundError(`Customer with id ${id} not found`);
     }
+
+    response.status(200).json({ customer });
   }
-}
 
-export class CustomerEdit {
-  constructor(readonly service: CustomerEditService) {}
-
-  async execute(request: Request, response: Response, next: NextFunction) {
-    try {
-      const id: Uuid = new Uuid(request.params.id);
-      const { name, document } = request.body;
-      const customer = Customer.create(name, document, id.getValue());
-      await this.service.execute(customer);
-      response.status(200).json({ customer });
-    } catch (error) {
-      next(error);
+  async edit(request: Request, response: Response) {
+    if (!request.body.name || !request.body.document) {
+      throw new BadRequestError("Name and document are required");
     }
+
+    const id = request.params.id;
+    const customer = await customerRepository.findOneBy({ id });
+
+    if (!customer) {
+      throw new NotFoundError(`Customer with id ${id} not found`);
+    }
+
+    const test = await customerRepository.update(id, { ...request.body });
+
+    response.status(200).json({ ...request.body });
   }
-}
 
-export class CustomerDelete {
-  constructor(readonly service: CustomerDeleteService) {}
+  async delete(request: Request, response: Response) {
+    const id = request.params.id;
 
-  async execute(request: Request, response: Response, next: NextFunction) {
-    try {
-      const id: Uuid = new Uuid(request.params.id);
-      await this.service.execute(id);
-      response
-        .status(200)
-        .send({ message: `Customer with id ${id.getValue()} deleted` });
-    } catch (error) {
-      next(error);
+    const customer = await customerRepository.findOneBy({ id });
+
+    if (!customer) {
+      throw new NotFoundError(`Customer with id ${id} not found`);
     }
+
+    await customerRepository.delete(id);
+
+    response.status(200).json({ message: `Customer with id ${id} deleted` });
   }
 }

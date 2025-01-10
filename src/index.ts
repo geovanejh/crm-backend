@@ -1,18 +1,21 @@
 import "express-async-errors";
 import { ErrorHandler } from "./middlewares/error";
-import router from "./router";
+import costumerRouter from "./routes/customerRouter";
+import userRouter from "./routes/userRouter";
+import { AppDataSource } from "./data-source";
+import { authMiddleware } from "./middlewares/authMiddleware";
 
-const express = require("express");
+AppDataSource.initialize().then(() => {
+  const express = require("express");
 
-const app = express();
+  const app = express();
+  app.use(express.json());
 
-app.use(express.json());
+  app.use(userRouter);
 
-app.use(router);
+  app.use(authMiddleware);
+  app.use(costumerRouter);
+  app.use(ErrorHandler);
 
-app.use(ErrorHandler);
-
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  return app.listen(process.env.PORT);
 });
