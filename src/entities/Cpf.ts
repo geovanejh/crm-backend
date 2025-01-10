@@ -1,17 +1,14 @@
 import { Document } from "./Document";
 
-export class Cnpj implements Document {
+export class Cpf implements Document {
   private value: string;
 
   constructor(value: string) {
-    if (!Cnpj.isValid(value)) {
-      throw new Error(`Invalid CNPJ: ${value}`);
-    }
     this.value = value;
   }
 
   static isValid(value: string): boolean {
-    return value.length === 14;
+    return value.length === 11;
   }
 
   getDocument(): Document {
