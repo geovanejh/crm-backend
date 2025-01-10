@@ -16,8 +16,6 @@ This project was created for educational purposes to demonstrate the implementat
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Installation
 
@@ -33,14 +31,19 @@ This project was created for educational purposes to demonstrate the implementat
     ```sh
     npm install
     ```
+4. Run the database migrations:
+    ```sh
+    npm run typeorm migration:run
+    ```
 
 ## Usage
 
 1. Start the development server:
     ```sh
-    npm start
+    npm run dev
     ```
 2. The server will be running at `http://localhost:3000`.
+    ```
 
 ## API Endpoints
 
