@@ -39,6 +39,6 @@ export const authMiddleware = async (
 
     next();
   } catch (error) {
-    throw new UnauthorizedError("invalid email or password");
+    throw new UnauthorizedError("Invalid access token");
   }
 };

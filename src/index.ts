@@ -4,11 +4,13 @@ import costumerRouter from "./routes/customerRouter";
 import userRouter from "./routes/userRouter";
 import { AppDataSource } from "./data-source";
 import { authMiddleware } from "./middlewares/authMiddleware";
+import cors from "cors";
 
 AppDataSource.initialize().then(() => {
   const express = require("express");
 
   const app = express();
+  app.use(cors());
   app.use(express.json());
 
   app.use(userRouter);
