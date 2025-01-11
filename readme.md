@@ -42,8 +42,8 @@ This project was created for educational purposes to demonstrate the implementat
     ```sh
     npm run dev
     ```
-2. The server will be running at `http://localhost:3000`.
-    ```
+The server will be running at `http://localhost:3000`.
+   
 
 ## API Endpoints
 
