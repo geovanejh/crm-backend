@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 import { BadRequestError, UnauthorizedError } from "../utils/api-errors";
 import jwt from "jsonwebtoken";
 import { Uuid } from "../entities/Uuid";
+import nodemailer, { Transporter } from "nodemailer";
+import { sendEmail } from "../utils/email-sender";
 
 type JwtPayload = {
   id: Uuid;
@@ -11,7 +13,7 @@ type JwtPayload = {
 
 export class UserController {
   async create(req: Request, res: Response) {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone } = req.body;
 
     const userExists = await userRepository.findOneBy({ email });
 
@@ -21,15 +23,23 @@ export class UserController {
 
     const hashPassword = await bcrypt.hash(password, 10);
 
+    const activationToken = generateVerificationToken(email);
+
     const newUser = userRepository.create({
       name,
       email,
+      phone,
       password: hashPassword,
+      activationToken,
     });
 
     await userRepository.save(newUser);
 
-    const { password: _, ...user } = newUser;
+    const { password: _, activationToken: __, ...user } = newUser;
+
+    sendVerificationEmail(email).catch((error) => {
+      console.error("Erro ao enviar o e-mail de verificação:", error);
+    });
 
     return res.status(201).json(user);
   }
@@ -60,3 +70,27 @@ export class UserController {
     return res.json(req.user);
   }
 }
+
+const generateVerificationToken = (email: string) => {
+  const secretKey = process.env.JWT_SECRET ?? "";
+  const expiresIn = "24h";
+  return jwt.sign({ email }, secretKey, { expiresIn });
+};
+
+const sendVerificationEmail = async (userEmail: string): Promise<void> => {
+  const token = generateVerificationToken(userEmail);
+  // const verificationUrl = `http://localhost:3000/verify-email?token=${token}`;
+
+  const htmlContent = `
+      <h1>Confirmação de E-mail</h1>
+      <p>Olá,</p>
+      <p>Por favor, clique no link abaixo para verificar seu e-mail:</p>
+      <a href="#">token: ${token}</a>
+  `;
+
+  await sendEmail({
+    to: userEmail,
+    subject: "Confirmação de E-mail",
+    htmlContent,
+  });
+};

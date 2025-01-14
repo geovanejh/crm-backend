@@ -14,4 +14,16 @@ export class User {
 
   @Column({ type: "text" })
   password: string;
+
+  @Column({ type: "text", nullable: false })
+  phone: string;
+
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  created_at: Date;
+
+  @Column({ type: "text", nullable: true })
+  activationToken: string;
+
+  @Column({ type: "boolean", default: false })
+  activated: boolean;
 }
