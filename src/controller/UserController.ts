@@ -63,11 +63,47 @@ export class UserController {
       expiresIn: "8h",
     });
 
-    return res.status(200).json({ token });
+    return res
+      .status(200)
+      .json({ token, email: user.email, activated: user.activated });
   }
 
   async getProfile(req: Request, res: Response) {
     return res.json(req.user);
+  }
+
+  async verifyEmail(req: Request, res: Response) {
+    const { token } = req.query;
+
+    if (!token) {
+      throw new BadRequestError("Token not provided");
+    }
+
+    try {
+      const decoded = jwt.verify(token as string, process.env.JWT_SECRET ?? "");
+
+      if (typeof decoded === "string") {
+        throw new UnauthorizedError("Invalid token");
+      }
+
+      const user = await userRepository.findOneBy({ email: decoded.email });
+
+      if (!user) {
+        throw new UnauthorizedError("Invalid token");
+      }
+
+      if (user.activated === true) {
+        return res.status(400).json({ message: "Email already verified" });
+      } else {
+        user.activated = true;
+      }
+
+      await userRepository.save(user);
+
+      return res.status(200).json({ message: "Email verified" });
+    } catch (error) {
+      throw new UnauthorizedError("Invalid token");
+    }
   }
 }
 
@@ -79,13 +115,13 @@ const generateVerificationToken = (email: string) => {
 
 const sendVerificationEmail = async (userEmail: string): Promise<void> => {
   const token = generateVerificationToken(userEmail);
-  // const verificationUrl = `http://localhost:3000/verify-email?token=${token}`;
+  const verificationUrl = `http://localhost:3000/verify-email?token=${token}`;
 
   const htmlContent = `
       <h1>Confirmação de E-mail</h1>
       <p>Olá,</p>
       <p>Por favor, clique no link abaixo para verificar seu e-mail:</p>
-      <a href="#">token: ${token}</a>
+      Link: <a href="${verificationUrl}"> Clique aqui!</a>
   `;
 
   await sendEmail({

@@ -4,35 +4,33 @@ import "dotenv/config";
 
 const Nodemailer = require("nodemailer");
 
-// Tipagem para os dados de envio de e-mail
 interface EmailOptions {
   to: string;
   subject: string;
   htmlContent: string;
 }
 
-// Configuração do transporte com Mailtrap
-var transport = nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
-  port: 2525,
+const transporter = nodemailer.createTransport({
+  host: "smtp.zoho.com",
+  port: 465,
+  secure: true,
   auth: {
-    user: "01c8f899606485",
-    pass: "7c1115c8ccda55",
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS,
   },
 });
 
-// Função para enviar o e-mail
 export const sendEmail = async ({
   to,
   subject,
   htmlContent,
 }: EmailOptions): Promise<void> => {
   try {
-    const info = await transport.sendMail({
-      from: '"Sua Aplicação" <no-reply@suaaplicacao.com>', // Remetente
-      to, // Destinatário
-      subject, // Assunto
-      html: htmlContent, // Conteúdo HTML
+    const info = await transporter.sendMail({
+      from: '"CRM" <crmgetest@zohomail.com>',
+      to,
+      subject,
+      html: htmlContent,
     });
 
     console.log("E-mail enviado com sucesso:", info.messageId);
