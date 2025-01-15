@@ -7,5 +7,6 @@ const routes = Router();
 routes.post("/user", new UserController().create);
 routes.post("/login", new UserController().login);
 routes.get("/profile", new UserController().getProfile);
+routes.get("/verify-email", new UserController().verifyEmail);
 
 export default routes;
