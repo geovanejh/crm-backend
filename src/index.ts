@@ -4,8 +4,8 @@ import cors from "cors";
 import { AppDataSource } from "./data-source";
 import { env } from "./config/env";
 
-import { UserRepository } from "./repositories/UserRepository";
-import { CustomerRepository } from "./repositories/CustomerRepository";
+import { UserRepository } from "./repositories/userRepository";
+import { CustomerRepository } from "./repositories/customerRepository";
 
 import { CreateUserUseCase } from "./use-cases/user/CreateUserUseCase";
 import { LoginUserUseCase } from "./use-cases/user/LoginUserUseCase";
