@@ -1,44 +1,38 @@
 import { NextFunction, Request, Response } from "express";
-import { BadRequestError, UnauthorizedError } from "../utils/api-errors";
-import { userRepository } from "../repositories/userRepository";
+import { UnauthorizedError } from "../utils/api-errors";
+import { IUserRepository } from "../domain/repositories/IUserRepository";
 import jwt from "jsonwebtoken";
-import { Uuid } from "../entities/Uuid";
+import { env } from "../config/env";
 
 type JwtPayload = {
-  id: Uuid;
+  id: string;
 };
 
-export const authMiddleware = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { authorization } = req.headers;
+export function createAuthMiddleware(userRepo: IUserRepository) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { authorization } = req.headers;
 
-  if (!authorization) {
-    throw new UnauthorizedError("Authorization token is required");
-  }
-
-  const token = authorization.split(" ")[1];
-
-  try {
-    const { id } = jwt.verify(
-      token,
-      process.env.JWT_SECRET ?? ""
-    ) as JwtPayload;
-
-    const user = await userRepository.findOneBy({ id });
-
-    if (!user) {
-      throw new BadRequestError("Email or password incorrect");
+    if (!authorization) {
+      throw new UnauthorizedError("Authorization token is required");
     }
 
-    const { password: _, ...userData } = user;
+    const token = authorization.split(" ")[1];
 
-    req.user = userData;
+    try {
+      const { id } = jwt.verify(token, env.jwt.secret) as JwtPayload;
 
-    next();
-  } catch (error) {
-    throw new UnauthorizedError("Invalid access token");
-  }
-};
+      const user = await userRepo.findById(id);
+
+      if (!user) {
+        throw new UnauthorizedError("Invalid access token");
+      }
+
+      const { password: _, ...userData } = user;
+      req.user = userData;
+
+      next();
+    } catch (error) {
+      throw new UnauthorizedError("Invalid access token");
+    }
+  };
+}

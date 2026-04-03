@@ -1,8 +1,5 @@
-import nodemailer, { Transporter } from "nodemailer";
-const { MailtrapTransport } = require("mailtrap");
-import "dotenv/config";
-
-const Nodemailer = require("nodemailer");
+import nodemailer from "nodemailer";
+import { env } from "../config/env";
 
 interface EmailOptions {
   to: string;
@@ -11,12 +8,12 @@ interface EmailOptions {
 }
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.zoho.com",
-  port: 465,
+  host: env.mail.host,
+  port: env.mail.port,
   secure: true,
   auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS,
+    user: env.mail.user,
+    pass: env.mail.pass,
   },
 });
 
@@ -27,7 +24,7 @@ export const sendEmail = async ({
 }: EmailOptions): Promise<void> => {
   try {
     const info = await transporter.sendMail({
-      from: '"CRM" <crmgetest@zohomail.com>',
+      from: env.mail.from,
       to,
       subject,
       html: htmlContent,

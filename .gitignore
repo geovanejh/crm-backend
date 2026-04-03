@@ -87,3 +87,7 @@ public/
 
 # Windows files
 Thumbs.db
+
+# AI tool files
+CLAUDE.md
+.claude/

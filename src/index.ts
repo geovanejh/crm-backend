@@ -1,23 +1,65 @@
 import "express-async-errors";
-import { ErrorHandler } from "./middlewares/error";
-import costumerRouter from "./routes/customerRouter";
-import userRouter from "./routes/userRouter";
-import { AppDataSource } from "./data-source";
-import { authMiddleware } from "./middlewares/authMiddleware";
+import express from "express";
 import cors from "cors";
+import { AppDataSource } from "./data-source";
+import { env } from "./config/env";
+
+import { UserRepository } from "./repositories/UserRepository";
+import { CustomerRepository } from "./repositories/CustomerRepository";
+
+import { CreateUserUseCase } from "./use-cases/user/CreateUserUseCase";
+import { LoginUserUseCase } from "./use-cases/user/LoginUserUseCase";
+import { VerifyEmailUseCase } from "./use-cases/user/VerifyEmailUseCase";
+import { CreateCustomerUseCase } from "./use-cases/customer/CreateCustomerUseCase";
+import { ListCustomersUseCase } from "./use-cases/customer/ListCustomersUseCase";
+import { GetCustomerUseCase } from "./use-cases/customer/GetCustomerUseCase";
+import { UpdateCustomerUseCase } from "./use-cases/customer/UpdateCustomerUseCase";
+import { DeleteCustomerUseCase } from "./use-cases/customer/DeleteCustomerUseCase";
+
+import { UserController } from "./controllers/UserController";
+import { CustomerController } from "./controllers/CustomerController";
+
+import { createUserRouter } from "./routes/userRouter";
+import { createCustomerRouter } from "./routes/customerRouter";
+import { createAuthMiddleware } from "./middlewares/authMiddleware";
+import { ErrorHandler } from "./middlewares/error";
 
 AppDataSource.initialize().then(() => {
-  const express = require("express");
-
   const app = express();
+
   app.use(cors());
   app.use(express.json());
 
-  app.use(userRouter);
+  // Repositories
+  const userRepo = new UserRepository();
+  const customerRepo = new CustomerRepository();
 
+  // Middleware
+  const authMiddleware = createAuthMiddleware(userRepo);
+
+  // Use Cases
+  const userController = new UserController(
+    new CreateUserUseCase(userRepo),
+    new LoginUserUseCase(userRepo),
+    new VerifyEmailUseCase(userRepo)
+  );
+
+  const customerController = new CustomerController(
+    new CreateCustomerUseCase(customerRepo),
+    new ListCustomersUseCase(customerRepo),
+    new GetCustomerUseCase(customerRepo),
+    new UpdateCustomerUseCase(customerRepo),
+    new DeleteCustomerUseCase(customerRepo)
+  );
+
+  // Routes
+  app.use(createUserRouter(userController, authMiddleware));
   app.use(authMiddleware);
-  app.use(costumerRouter);
+  app.use(createCustomerRouter(customerController));
+
   app.use(ErrorHandler);
 
-  return app.listen(process.env.PORT);
+  app.listen(env.port, () => {
+    console.log(`Server running on port ${env.port}`);
+  });
 });

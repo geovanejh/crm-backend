@@ -1,61 +1,115 @@
 # CRM Backend
- 
-This project was created for educational purposes to demonstrate the implementation of a CRM backend using modern web technologies.
 
-## Technologies Used
+API REST para gerenciamento de clientes e usuarios, construida com **Express + TypeScript + TypeORM + PostgreSQL**, seguindo principios de **Clean Architecture**.
 
-- **Node.js**: JavaScript runtime built on Chrome's V8 JavaScript engine.
-- **Express**: Fast, unopinionated, minimalist web framework for Node.js.
-- **TypeORM**: An ORM that can run in NodeJS, Browser, Cordova, PhoneGap, Ionic, React Native, NativeScript, Expo, and Electron platforms and can be used with TypeScript and JavaScript (ES5, ES6, ES7, ES8).
-- **MySQL**: A relational database management system based on SQL – Structured Query Language.
-- **JWT**: JSON Web Tokens for secure authentication.
-- **Bcrypt**: Library to help hash passwords.
-- **Dotenv**: Module to load environment variables from a `.env` file.
+## Funcionalidades
 
-## Table of Contents
-- [Installation](#installation)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
+- Cadastro e autenticacao de usuarios (JWT)
+- Verificacao de e-mail via link de ativacao
+- CRUD de clientes (protegido por autenticacao)
+- Validacao de documentos (CPF/CNPJ)
 
-## Installation
+## Tecnologias
 
-1. Clone the repository:
-    ```sh
-    git clone https://github.com/yourusername/crm-backend.git
-    ```
-2. Navigate to the project directory:
-    ```sh
-    cd crm-backend
-    ```
-3. Install dependencies:
-    ```sh
-    npm install
-    ```
-4. Run the database migrations:
-    ```sh
-    npm run typeorm migration:run
-    ```
+- **Runtime:** Node.js + TypeScript
+- **Framework:** Express
+- **ORM:** TypeORM
+- **Banco de dados:** PostgreSQL
+- **Autenticacao:** JWT (jsonwebtoken) + bcrypt
+- **E-mail:** Nodemailer (SMTP Zoho)
 
-## Usage
+## Pre-requisitos
 
-1. Start the development server:
-    ```sh
-    npm run dev
-    ```
-The server will be running at `http://localhost:3000`.
-   
+- Node.js >= 18
+- PostgreSQL instalado e rodando
 
-## API Endpoints
+## Instalacao
 
-- `GET /api/customers` - Retrieve a list of customers
-- `POST /api/customers` - Create a new customer
-- `GET /api/customers/:id` - Retrieve a specific customer by ID
-- `PUT /api/customers/:id` - Update a specific customer by ID
-- `DELETE /api/customers/:id` - Delete a specific customer by ID
+```bash
+# Instalar dependencias
+npm install
 
-### Authentication Endpoints
+# Configurar variaveis de ambiente
+cp .env.example .env
+# Edite o .env com suas credenciais
 
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Authenticate a user and return a token
-- `POST /api/auth/logout` - Log out a user and invalidate the token
-- `GET /api/auth/me` - Retrieve the authenticated user's information
+# Criar o banco de dados
+createdb customer
+
+# Rodar migrations
+npm run migration:run
+
+# Iniciar servidor de desenvolvimento
+npm run dev
+```
+
+## Variaveis de Ambiente
+
+| Variavel      | Descricao                       | Exemplo                |
+| ------------- | ------------------------------- | ---------------------- |
+| `DB_HOST`     | Host do PostgreSQL              | `localhost`            |
+| `DB_PORT`     | Porta do PostgreSQL             | `5432`                 |
+| `DB_USER`     | Usuario do banco                | `postgres`             |
+| `DB_PASS`     | Senha do banco                  | `senha`                |
+| `DB_NAME`     | Nome do banco                   | `customer`             |
+| `JWT_SECRET`  | Chave secreta para JWT          | `minha-chave`          |
+| `MAIL_USER`   | E-mail para envio (Zoho SMTP)   | `user@zoho.com`        |
+| `MAIL_PASS`   | Senha do e-mail                 | `senha`                |
+| `PORT`        | Porta do servidor               | `3000`                 |
+| `APP_URL`     | URL base da aplicacao (opcional) | `http://localhost:3000` |
+
+## Endpoints
+
+### Publicos
+
+| Metodo | Rota            | Descricao                    |
+| ------ | --------------- | ---------------------------- |
+| POST   | `/user`         | Cadastrar novo usuario       |
+| POST   | `/login`        | Autenticar usuario           |
+| GET    | `/verify-email` | Verificar e-mail (via token) |
+
+### Autenticados (Bearer Token)
+
+| Metodo | Rota             | Descricao                |
+| ------ | ---------------- | ------------------------ |
+| GET    | `/profile`       | Obter perfil do usuario  |
+| POST   | `/customer`      | Criar cliente            |
+| GET    | `/customer`      | Listar todos os clientes |
+| GET    | `/customer/:id`  | Buscar cliente por ID    |
+| PUT    | `/customer/:id`  | Atualizar cliente        |
+| DELETE | `/customer/:id`  | Deletar cliente          |
+
+## Arquitetura
+
+O projeto segue **Clean Architecture** com separacao clara de responsabilidades:
+
+```
+src/
+├── config/            -- Configuracao centralizada (env)
+├── domain/            -- Regras de dominio (interfaces, value objects)
+├── entities/          -- Entidades TypeORM
+├── repositories/      -- Implementacoes dos repositorios
+├── use-cases/         -- Casos de uso (logica de negocio)
+├── controllers/       -- Adaptadores HTTP (request/response)
+├── routes/            -- Definicao de rotas (factory functions)
+├── middlewares/       -- Auth e error handler
+├── utils/             -- Erros customizados e envio de e-mail
+└── index.ts           -- Composition root
+```
+
+### Fluxo de uma requisicao
+
+```
+Request -> Route -> Controller -> Use Case -> Repository -> Database
+                                     |
+                                     └-> Domain (Value Objects, Interfaces)
+```
+
+## Scripts
+
+| Comando                      | Descricao                              |
+| ---------------------------- | -------------------------------------- |
+| `npm run dev`                | Iniciar servidor com hot-reload        |
+| `npm run migration:generate` | Gerar migration a partir das entidades |
+| `npm run migration:run`      | Executar migrations pendentes          |
+| `npx tsc --noEmit`           | Verificar tipos (sem compilar)         |
