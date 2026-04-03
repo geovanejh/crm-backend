@@ -1,12 +1,16 @@
 import { Router } from "express";
-import { UserController } from "../controller/UserController";
-import { authMiddleware } from "../middlewares/authMiddleware";
+import { UserController } from "../controllers/UserController";
 
-const routes = Router();
+export function createUserRouter(
+  controller: UserController,
+  authMiddleware: ReturnType<typeof import("../middlewares/authMiddleware").createAuthMiddleware>
+): Router {
+  const router = Router();
 
-routes.post("/user", new UserController().create);
-routes.post("/login", new UserController().login);
-routes.get("/profile", new UserController().getProfile);
-routes.get("/verify-email", new UserController().verifyEmail);
+  router.post("/user", controller.create);
+  router.post("/login", controller.login);
+  router.get("/profile", authMiddleware, controller.getProfile);
+  router.get("/verify-email", controller.verifyEmail);
 
-export default routes;
+  return router;
+}

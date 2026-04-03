@@ -1,16 +1,14 @@
 import { Router } from "express";
-import { CustomerController } from "../controller/CustomerController";
+import { CustomerController } from "../controllers/CustomerController";
 
-const costumerRouter = Router();
+export function createCustomerRouter(controller: CustomerController): Router {
+  const router = Router();
 
-costumerRouter.post("/customer", new CustomerController().create);
+  router.post("/customer", controller.create);
+  router.get("/customer", controller.getAll);
+  router.get("/customer/:id", controller.getById);
+  router.put("/customer/:id", controller.edit);
+  router.delete("/customer/:id", controller.delete);
 
-costumerRouter.get("/customer", new CustomerController().getAll);
-
-costumerRouter.get("/customer/:id", new CustomerController().getById);
-
-costumerRouter.put("/customer/:id", new CustomerController().edit);
-
-costumerRouter.delete("/customer/:id", new CustomerController().delete);
-
-export default costumerRouter;
+  return router;
+}
