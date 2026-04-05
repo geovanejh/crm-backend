@@ -33,7 +33,7 @@ export class CreateUserUseCase {
       activationToken,
     });
 
-    this.sendVerificationEmail(email).catch((error) => {
+    this.sendVerificationEmail(email, activationToken).catch((error) => {
       console.error("Erro ao enviar o e-mail de verificação:", error);
     });
 
@@ -47,8 +47,7 @@ export class CreateUserUseCase {
     });
   }
 
-  private async sendVerificationEmail(userEmail: string): Promise<void> {
-    const token = this.generateVerificationToken(userEmail);
+  private async sendVerificationEmail(userEmail: string, token: string): Promise<void> {
     const verificationUrl = `${env.appUrl}/verify-email?token=${token}`;
 
     const htmlContent = `

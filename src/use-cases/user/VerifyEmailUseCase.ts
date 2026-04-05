@@ -33,11 +33,15 @@ export class VerifyEmailUseCase {
       }
 
       user.activated = true;
+      user.activationToken = null as any;
       await this.userRepo.save(user);
 
       return { message: "Email verified" };
     } catch (error) {
-      if (error instanceof BadRequestError || error instanceof UnauthorizedError) {
+      if (
+        error instanceof BadRequestError ||
+        error instanceof UnauthorizedError
+      ) {
         throw error;
       }
       throw new UnauthorizedError("Invalid token");

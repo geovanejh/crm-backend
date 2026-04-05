@@ -10,7 +10,7 @@ export function createUserRouter(
   router.post("/user", controller.create);
   router.post("/login", controller.login);
   router.get("/profile", authMiddleware, controller.getProfile);
-  router.get("/verify-email", controller.verifyEmail);
+  router.post("/verify-email", controller.verifyEmail);
 
   return router;
 }

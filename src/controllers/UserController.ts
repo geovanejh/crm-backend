@@ -26,7 +26,7 @@ export class UserController {
 
   verifyEmail = async (req: Request, res: Response) => {
     const result = await this.verifyEmailUC.execute({
-      token: req.query.token as string,
+      token: req.body.token,
     });
     return res.status(200).json(result);
   };

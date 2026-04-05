@@ -10,7 +10,7 @@ interface EmailOptions {
 const transporter = nodemailer.createTransport({
   host: env.mail.host,
   port: env.mail.port,
-  secure: true,
+  secure: false,
   auth: {
     user: env.mail.user,
     pass: env.mail.pass,
