@@ -15,11 +15,11 @@ export const env = {
     emailTokenExpiresIn: "24h" as const,
   },
   mail: {
-    host: "smtp.zoho.com",
-    port: 465,
+    host: process.env.MAIL_HOST || "sandbox.smtp.mailtrap.io",
+    port: Number(process.env.MAIL_PORT) || 2525,
     user: process.env.MAIL_USER || "",
     pass: process.env.MAIL_PASS || "",
-    from: '"CRM" <crmgetest@zohomail.com>',
+    from: process.env.MAIL_FROM || '"CRM" <noreply@crm.local>',
   },
   appUrl: process.env.APP_URL || "http://localhost:3000",
 };

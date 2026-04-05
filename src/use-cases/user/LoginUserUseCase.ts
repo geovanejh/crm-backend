@@ -15,8 +15,13 @@ export class LoginUserUseCase {
   async execute({ email, password }: LoginInput) {
     const user = await this.userRepo.findByEmail(email);
 
+    
     if (!user) {
       throw new BadRequestError("Email or password incorrect");
+    }
+    
+    if (user.activated === false) {
+      throw new BadRequestError("This email has not been verified yet. Please check your inbox for the verification email.");
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
