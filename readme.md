@@ -1,12 +1,13 @@
 # CRM Backend
 
-API REST para gerenciamento de clientes e usuarios, construida com **Express + TypeScript + TypeORM + PostgreSQL**, seguindo principios de **Clean Architecture**.
+API REST para gerenciamento de clientes, empresas e usuarios, construida com **Express + TypeScript + TypeORM + PostgreSQL**, seguindo principios de **Clean Architecture**.
 
 ## Funcionalidades
 
 - Cadastro e autenticacao de usuarios (JWT)
 - Verificacao de e-mail via link de ativacao
 - CRUD de clientes (protegido por autenticacao)
+- CRUD de empresas vinculadas ao usuario (multi-tenancy)
 - Validacao de documentos (CPF/CNPJ)
 
 ## Tecnologias
@@ -72,12 +73,17 @@ npm run dev
 
 | Metodo | Rota             | Descricao                |
 | ------ | ---------------- | ------------------------ |
-| GET    | `/profile`       | Obter perfil do usuario  |
-| POST   | `/customer`      | Criar cliente            |
-| GET    | `/customer`      | Listar todos os clientes |
-| GET    | `/customer/:id`  | Buscar cliente por ID    |
-| PUT    | `/customer/:id`  | Atualizar cliente        |
-| DELETE | `/customer/:id`  | Deletar cliente          |
+| GET    | `/profile`              | Obter perfil do usuario          |
+| POST   | `/customer`             | Criar cliente                    |
+| GET    | `/customer`             | Listar todos os clientes         |
+| GET    | `/customer/:id`         | Buscar cliente por ID            |
+| PUT    | `/customer/:id`         | Atualizar cliente                |
+| DELETE | `/customer/:id`         | Deletar cliente                  |
+| POST   | `/company`              | Criar empresa                    |
+| GET    | `/company`              | Listar empresas do usuario       |
+| GET    | `/company/:companyId`   | Buscar empresa por ID            |
+| PUT    | `/company/:companyId`   | Atualizar empresa                |
+| DELETE | `/company/:companyId`   | Deletar empresa                  |
 
 ## Arquitetura
 
@@ -87,9 +93,9 @@ O projeto segue **Clean Architecture** com separacao clara de responsabilidades:
 src/
 ├── config/            -- Configuracao centralizada (env)
 ├── domain/            -- Regras de dominio (interfaces, value objects)
-├── entities/          -- Entidades TypeORM
+├── entities/          -- Entidades TypeORM (User, Customer, Company)
 ├── repositories/      -- Implementacoes dos repositorios
-├── use-cases/         -- Casos de uso (logica de negocio)
+├── use-cases/         -- Casos de uso (user, customer, company)
 ├── controllers/       -- Adaptadores HTTP (request/response)
 ├── routes/            -- Definicao de rotas (factory functions)
 ├── middlewares/       -- Auth e error handler

@@ -1,7 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Company } from "./Company";
 
 @Entity("users")
 export class User {
+  @OneToMany(() => Company, (company) => company.user)
+  companies: Company[];
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
