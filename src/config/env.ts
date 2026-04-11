@@ -22,4 +22,5 @@ export const env = {
     from: process.env.MAIL_FROM || '"CRM" <noreply@crm.local>',
   },
   appUrl: process.env.APP_URL || "http://localhost:3000",
+  frontendUrl: process.env.FRONTEND_URL || "http://localhost:5173",
 };

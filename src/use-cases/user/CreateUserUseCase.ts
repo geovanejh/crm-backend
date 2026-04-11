@@ -48,7 +48,7 @@ export class CreateUserUseCase {
   }
 
   private async sendVerificationEmail(userEmail: string, token: string): Promise<void> {
-    const verificationUrl = `${env.appUrl}/verify-email?token=${token}`;
+    const verificationUrl = `${env.frontendUrl}/verify-email?token=${token}`;
 
     const htmlContent = `
       <h1>Confirmação de E-mail</h1>
