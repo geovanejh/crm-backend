@@ -1,69 +1,46 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Param } from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user-dto'
 import { UpdateUserDto } from './dto/update-user-dto'
 import { NotFoundException } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { User } from './user.entity'
+import { Repository } from 'typeorm'
+import { UserRole } from './enums/user-role.enum'
 
 @Injectable()
 export class UsersService {
-  private readonly users = [
-    {
-      id: 1,
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      role: 'OWNER',
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      role: 'ADMIN',
-    },
-  ]
+  constructor(
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
+  ) {}
 
-  findAll(role?: 'OWNER' | 'ADMIN' | 'SALESPERSON') {
+  findAll(role?: UserRole): Promise<User[]> {
     if (role) {
-      const rolesArray = this.users.filter((user) => user.role === role)
-      if (!rolesArray.length) {
-        throw new NotFoundException(`No users found with role ${role}`)
-      }
-      return rolesArray
+      return this.usersRepository.find({ where: { role } })
     }
-    return this.users
+    return this.usersRepository.find({ where: { role } })
   }
 
-  findOne(id: number) {
-    const user = this.users.find((user) => user.id === id)
+  async findOne(@Param('id') id: string): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ id })
     if (!user) {
       throw new NotFoundException('User not found')
     }
     return user
   }
 
-  create(createUserDto: CreateUserDto) {
-    const highestId = this.users.reduce((maxId, user) => Math.max(maxId, user.id), 0)
-    const newUser = { id: highestId + 1, ...createUserDto }
-    this.users.push(newUser)
-    return newUser
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const user = this.usersRepository.create(createUserDto) // cria instancia em memoria (NAO salva)
+    return this.usersRepository.save(user) // INSERT INTO users (...) VALUES (...)
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    const existingUser = this.findOne(id)
-    if (existingUser) {
-      Object.assign(existingUser, updateUserDto)
-      return existingUser
-    } else {
-      throw new NotFoundException('User not found')
-    }
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.findOne(id) // busca ou lanca 404
+    Object.assign(user, updateUserDto) // mescla os campos atualizados
+    return this.usersRepository.save(user) // UPDATE users SET ... WHERE id = $1
   }
 
-  remove(id: number) {
-    const index = this.users.findIndex((user) => user.id === id)
-    if (index !== -1) {
-      const removedUser = this.users.splice(index, 1)
-      return removedUser[0]
-    } else {
-      throw new NotFoundException('User not found')
-    }
-    return null
+  async remove(id: string): Promise<void> {
+    await this.usersRepository.delete({ id })
   }
 }
